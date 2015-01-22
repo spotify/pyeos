@@ -14,7 +14,7 @@
 
 hostname = '10.48.71.3'
 username = 'admin'
-password = 'fGrzCgdfgxAasd'
+password = 'fGrzCgdfgxAasd' # Fake password, fix for testing environment
 use_ssl = True
 config_file_1 = 'config01.txt'
 config_file_2 = 'config02.txt'
