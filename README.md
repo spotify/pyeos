@@ -6,7 +6,7 @@ Python API for devices running EOS
 Documentation
 =============
 
-See the [Read the Docs](http://pyeos.readthedocs.com)
+See the [Read the Docs](http://pyeos.readthedocs.org)
 
 Install
 =======
