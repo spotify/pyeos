@@ -145,7 +145,7 @@ class EOS:
         :param config: String containing the desired configuration.
         """
 
-        if file is not None:
+        if filename is not None:
             self.candidate_config.load_config(filename=filename)
         else:
             self.candidate_config.load_config(config=config)
