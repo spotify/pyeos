@@ -9,9 +9,11 @@ install_reqs = parse_requirements('requirements.txt')
 # e.g. ['django==1.5.1', 'mezzanine==1.4.6']
 reqs = [str(ir.req) for ir in install_reqs]
 
+version = '0.3'
+
 setup(
     name='pyEOS',
-    version='0.2',
+    version=version,
     py_modules=['pyEOS'],
     packages=find_packages(),
     install_requires=reqs,
@@ -20,7 +22,7 @@ setup(
     author = 'David Barroso',
     author_email = 'dbarroso@spotify.com',
     url = 'https://github.com/spotify/pyeos/', # use the URL to the github repo
-    download_url = 'https://github.com/spotify/pyeos/tarball/0.2', # I'll explain this in a second
+    download_url = 'https://github.com/spotify/pyeos/tarball/%s' % version,
     keywords = ['EOS', 'networking'],
     classifiers = [],
 )
