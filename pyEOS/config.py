@@ -41,6 +41,7 @@ class EOSConf:
     def _parse_config(config):
         cmds = OrderedDict()
         prev_key = None
+        separator = ' '
 
         if isinstance(config, unicode) or isinstance(config, str):
             config = config.splitlines()
@@ -49,8 +50,13 @@ class EOSConf:
             line = line.strip('\n')
             if line is '' or line.startswith('!'):
                 pass
-            elif line.startswith(' '):
-                cmds[prev_key]['cmds'][line.strip()] = None
+            elif line.startswith('      '):
+                cmds[prev_key]['cmds'][sub_prev_key]['cmds'][line.strip()] = None
+            elif line.startswith('   '):
+                sub_prev_key = line.strip()
+                cmds[prev_key]['cmds'][sub_prev_key] = dict()
+                cmds[prev_key]['cmds'][sub_prev_key]['comments'] = list()
+                cmds[prev_key]['cmds'][sub_prev_key]['cmds'] = OrderedDict()
             else:
                 prev_key = line
                 cmds[line] = dict()
@@ -88,7 +94,10 @@ class EOSConf:
             txt += '%s\n' % key
 
             for k in value['cmds'].keys():
-                txt += '  %s\n' % k
+                txt += '   %s\n' % k
+
+                for sk in value['cmds'][k]['cmds'].keys():
+                    txt += '      %s\n' % sk
 
         return txt
 
@@ -119,19 +128,30 @@ class EOSConf:
         diff_text += _print('-', removed, self)
 
         for cmd in keep:
-            orig = set(self.cmds[cmd]['cmds'].keys())
-            cand = set(other.cmds[cmd]['cmds'].keys())
+            mine = self.cmds[cmd]['cmds']
+            sother = other.cmds[cmd]['cmds']
 
-            new = cand - orig
-            old = orig - cand
+            added = set(sother.keys()) - set(mine.keys())
+            removed = set(mine.keys()) - set(sother.keys())
+            keep = set(sother.keys()) & set(mine.keys())
 
-            if len(new) > 0 or len(old) > 0:
-                diff_text +=  "%s\n" % cmd
+            diff_text += _print('+', added, sother)
+            diff_text += _print('-', removed, mine)
 
-                for cmd in new:
-                    diff_text +=  "  + %s\n" % cmd
+            for scmd in keep:
+                orig = set(mine[scmd]['cmds'].keys())
+                cand = set(sother[scmd]['cmds'].keys())
 
-                for cmd in old:
-                    diff_text +=  "  - %s\n" % cmd
+                new = cand - orig
+                old = orig - cand
+
+                if len(new) > 0 or len(old) > 0:
+                    diff_text +=  "%s\n" % scmd
+
+                    for cmd in new:
+                        diff_text +=  "  + %s\n" % scmd
+
+                    for cmd in old:
+                        diff_text +=  "  - %s\n" % scmd
 
         return diff_text
