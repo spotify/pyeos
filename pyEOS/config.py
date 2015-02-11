@@ -48,7 +48,7 @@ class EOSConf:
 
         for line in config:
             line = line.strip('\n')
-            if line is '' or line.startswith('!'):
+            if line.strip() == '' or line.startswith('!'):
                 pass
             elif line.startswith('      '):
                 cmds[prev_key]['cmds'][sub_prev_key]['cmds'][line.strip()] = None
@@ -112,10 +112,12 @@ class EOSConf:
         def _print(action, list, config):
             diff_text = ''
             for cmd in list:
-                diff_text += '%s %s\n' % (action, cmd)
-                for key in config.cmds[cmd]['cmds'].keys():
-                    diff_text += '%s\n' % key
-
+                try:
+                    diff_text += '%s %s\n' % (action, cmd)
+                    for key in config.cmds[cmd]['cmds'].keys():
+                        diff_text += '%s\n' % key
+                except AttributeError as e:
+                    pass
             return diff_text
 
         diff_text = ''
