@@ -137,8 +137,14 @@ class EOSConf:
             removed = set(mine.keys()) - set(sother.keys())
             keep = set(sother.keys()) & set(mine.keys())
 
-            diff_text += _print('+', added, sother)
-            diff_text += _print('-', removed, mine)
+            add_text = _print('+', added, sother)
+            rem_text = _print('-', removed, mine)
+
+            if add_text != '' or rem_text != '':
+                diff_text += '%s\n' % cmd
+
+            diff_text += add_text
+            diff_text += rem_text
 
             for scmd in keep:
                 orig = set(mine[scmd]['cmds'].keys())
