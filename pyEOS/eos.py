@@ -161,13 +161,15 @@ class EOS:
         self.load_running_config()
         return self.running_config.compare_config(self.candidate_config)
 
-    def replace_config(self, config=None):
+    def replace_config(self, config=None, force=False):
         """
         Applies the configuration changes on the device. You can either commit the changes on the candidate_config
         attribute or you can send the desired configuration as a string. Note that the current configuration of the
         device is replaced with the new configuration.
 
         :param config: String containing the desired configuration. If set to None the candidate_config will be used
+        :param force: If set to False we rollback changes if we detect a config error.
+
         """
         if config is None:
             config = self.candidate_config.to_string()
@@ -177,7 +179,14 @@ class EOS:
             'input': config
         }
         self.original_config = self.get_config(format='text')
-        return self.run_commands([body])
+        result = self.run_commands([body])
+
+        if len(result[1]['messages'][0]) == 64:
+            return result
+        else:
+            if not force:
+                self.rollback()
+            raise exceptions.CommandError(result[1]['messages'][0])
 
     def rollback(self):
         """

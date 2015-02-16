@@ -9,7 +9,7 @@ install_reqs = parse_requirements('requirements.txt')
 # e.g. ['django==1.5.1', 'mezzanine==1.4.6']
 reqs = [str(ir.req) for ir in install_reqs]
 
-version = '0.5'
+version = '0.50'
 
 setup(
     name='pyEOS',
