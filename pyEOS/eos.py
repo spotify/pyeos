@@ -182,8 +182,10 @@ class EOS:
         result = self.run_commands([body])
 
         if len(result[1]['messages'][0]) == 64:
+            raise Exception(result)
             return result
         else:
+            raise Exception(result)
             if not force:
                 self.rollback()
             raise exceptions.CommandError(result[1]['messages'][0])
@@ -192,4 +194,4 @@ class EOS:
         """
         If used after a commit, the configuration will be reverted to the previous state.
         """
-        return self.replace_config(config=self.original_config)
+        return self.replace_config(config=self.original_config, format=True)
