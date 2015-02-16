@@ -174,20 +174,21 @@ class EOS:
         if config is None:
             config = self.candidate_config.to_string()
 
+        if force:
+            force_text = 'force'
+        else:
+            force_text = 'no-force'
+
         body = {
-            'cmd': 'configure replace terminal: force',
+            'cmd': 'configure replace terminal: %s' % force_text,
             'input': config
         }
         self.original_config = self.get_config(format='text')
         result = self.run_commands([body])
 
-        if len(result[1]['messages'][0]) == 64:
-            raise Exception(result)
+        if 'Invalid' not in result[1]['messages'][0]:
             return result
         else:
-            raise Exception(result)
-            if not force:
-                self.rollback()
             raise exceptions.CommandError(result[1]['messages'][0])
 
     def rollback(self):
