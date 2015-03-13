@@ -42,13 +42,24 @@ class EOSConf:
         cmds = OrderedDict()
         prev_key = None
         separator = ' '
+        banner = False
+        banner_txt = ''
 
         if isinstance(config, unicode) or isinstance(config, str):
             config = config.splitlines()
 
         for line in config:
             line = line.strip('\n')
+
             if line.strip() == '' or line.startswith('!'):
+                pass
+            elif line.startswith('EOF'):
+                banner = False
+                banner_txt += line
+                pass
+            elif line.startswith('banner motd') or banner is True:
+                banner = True
+                banner_txt += line
                 pass
             elif line.startswith('      '):
                 cmds[prev_key]['cmds'][sub_prev_key]['cmds'][line.strip()] = None

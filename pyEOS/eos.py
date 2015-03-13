@@ -105,6 +105,13 @@ class EOS:
                     )
                 else:
                     raise exceptions.CommandUnconverted(error)
+            # code -32602 means "Unexpected parameter 'timestamps' for method 'runCmds' provided"
+            elif code == -32602:
+                result = self.device.runCmds(
+                    version=version,
+                    cmds=commands,
+                    format=format
+                )
             elif code == 1002:
                 raise exceptions.CommandError(error)
             else:
