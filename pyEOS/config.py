@@ -56,11 +56,9 @@ class EOSConf:
             elif line.startswith('EOF'):
                 banner = False
                 banner_txt += line
-                pass
             elif line.startswith('banner motd') or banner is True:
                 banner = True
                 banner_txt += line
-                pass
             elif line.startswith('      '):
                 cmds[prev_key]['cmds'][sub_prev_key]['cmds'][line.strip()] = None
             elif line.startswith('   '):
