@@ -94,8 +94,8 @@ class EOS:
             code = e[0][0]
             error = e[0][1]
 
-            # code 1003 means the command is not yet converted to json
             if code == 1003:
+                # code 1003 means the command is not yet converted to json
                 if auto_format:
                     result = self.device.runCmds(
                         version=version,
@@ -113,7 +113,11 @@ class EOS:
                     format=format
                 )
             elif code == 1002:
+                # code 1002 means the command was wrong
                 raise exceptions.CommandError(error)
+            elif code == 1000:
+                # code 1000 means a command is wrong when doing a "config  replace"
+                raise exceptions.ConfigReplaceError(e)
             else:
                 raise exceptions.UnknownError((code, error))
 
@@ -182,9 +186,9 @@ class EOS:
             config = self.candidate_config.to_string()
 
         if force:
-            force_text = 'force'
+            force_text = 'ignore-errors'
         else:
-            force_text = 'no-force'
+            force_text = ''
 
         body = {
             'cmd': 'configure replace terminal: %s' % force_text,
