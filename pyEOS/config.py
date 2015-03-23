@@ -51,7 +51,7 @@ class EOSConf:
         for line in config:
             line = line.strip('\n')
 
-            if line.strip() == '' or line.startswith('!'):
+            if line.strip() == '' or '!' in line:
                 pass
             elif line.startswith('EOF'):
                 banner = False
