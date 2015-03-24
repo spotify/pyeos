@@ -206,4 +206,4 @@ class EOS:
         """
         If used after a commit, the configuration will be reverted to the previous state.
         """
-        return self.replace_config(config=self.original_config, format=True)
+        return self.replace_config(config=self.original_config, force=True)

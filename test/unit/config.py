@@ -12,9 +12,7 @@
 # License for the specific language governing permissions and limitations under
 # the License.
 
-hostname = '10.48.71.3'
-username = 'admin'
-password = 'fGrzCgdfgxAasd' # Fake password, fix for testing environment
+hostname = '192.168.76.10'
+username = 'dbarroso'
+password = 'this_is_not_a_secure_password'
 use_ssl = True
-config_file_1 = 'config01.txt'
-config_file_2 = 'config02.txt'
