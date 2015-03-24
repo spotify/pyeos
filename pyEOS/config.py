@@ -155,6 +155,7 @@ class EOSConf:
             diff_text += add_text
             diff_text += rem_text
 
+            sub_diff_text = ''
             for scmd in keep:
                 orig = set(mine[scmd]['cmds'].keys())
                 cand = set(sother[scmd]['cmds'].keys())
@@ -163,12 +164,16 @@ class EOSConf:
                 old = orig - cand
 
                 if len(new) > 0 or len(old) > 0:
-                    diff_text +=  "%s\n" % scmd
+                    sub_diff_text +=  "   %s\n" % scmd
 
-                    for cmd in new:
-                        diff_text +=  "  + %s\n" % scmd
+                    for sscmd in new:
+                        sub_diff_text +=  "     + %s\n" % sscmd
 
-                    for cmd in old:
-                        diff_text +=  "  - %s\n" % scmd
+                    for sscmd in old:
+                        sub_diff_text +=  "     - %s\n" % sscmd
+
+            if len(sub_diff_text) > 0:
+                diff_text += '%s\n' % cmd
+                diff_text += sub_diff_text
 
         return diff_text
