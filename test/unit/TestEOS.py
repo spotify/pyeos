@@ -19,15 +19,13 @@ import pyEOS.exceptions as exceptions
 
 import config
 
+
 class TestEOS(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
         cls.device = EOS(config.hostname, config.username, config.password, config.use_ssl)
         cls.device.open()
-
-        with open(config.config_file_1, 'r') as f:
-            cls.config_1 = f.readlines()
 
     @classmethod
     def tearDownClass(cls):
@@ -42,11 +40,12 @@ class TestEOS(unittest.TestCase):
         self.assertGreater(len(lldp), 0)
 
     def test_dynamic_show_command_unconverted(self):
-        routes = self.device.show_ip_route(auto_format=True)['output']
-        self.assertGreater(len(routes), 0)
+        # It has to be an unconverted command
+        kernel = self.device.show_kernel_interface_addr(auto_format=True)['output']
+        self.assertGreater(len(kernel), 0)
 
     def test_dynamic_show_command_raises_unconverted(self):
-        self.assertRaises(exceptions.CommandUnconverted, self.device.show_ip_route)
+        self.assertRaises(exceptions.CommandUnconverted, self.device.show_kernel_interface_addr)
 
     def test_wrong_command(self):
         self.assertRaises(exceptions.CommandError, self.device.show_ip_rout)
@@ -56,18 +55,28 @@ class TestEOS(unittest.TestCase):
         self.assertGreater(len(output), 0)
 
     def test_loading_config(self):
-        self.device.load_candidate_config(filename=config.config_file_1)
+        self.device.load_candidate_config(filename='configs/new_good.conf')
         self.device.replace_config()
         diff = self.device.compare_config()
+
+        # Reverting changes
+        self.device.load_candidate_config(filename='configs/initial.conf')
+        self.device.replace_config()
+
         self.assertEqual(len(diff), 0)
 
+    def test_loading_config_with_typo(self):
+        self.device.load_candidate_config(filename='configs/new_typo.conf')
+        self.assertRaises(exceptions.ConfigReplaceError, self.device.replace_config)
+
     def test_loading_modified_config_and_diff(self):
-        self.device.load_candidate_config(filename=config.config_file_2)
+        intended_diff = u'+ hostname pyeos-unittest-changed\n- hostname pyeos-unittest\nrouter bgp 65000\n   vrf test\n     + neighbor 1.1.1.2 maximum-routes 12000\n     + neighbor 1.1.1.2 remote-as 1\n     - neighbor 1.1.1.1 remote-as 1\n     - neighbor 1.1.1.1 maximum-routes 12000\n   vrf test2\n     + neighbor 2.2.2.3 remote-as 2\n     + neighbor 2.2.2.3 maximum-routes 12000\n     - neighbor 2.2.2.2 remote-as 2\n     - neighbor 2.2.2.2 maximum-routes 12000\ninterface Ethernet2\n+ description ble\n- description bla\n'
+        self.device.load_candidate_config(filename='configs/new_good.conf')
         diff = self.device.compare_config()
-        self.assertGreater(len(diff), 0)
+        self.assertEqual(unicode(diff), unicode(intended_diff))
 
     def test_loading_modified_config_replace_config_and_rollback(self):
-        self.device.load_candidate_config(filename=config.config_file_2)
+        self.device.load_candidate_config(filename='configs/new_good.conf')
         orig_diff = self.device.compare_config()
         self.device.replace_config()
         replace_config_diff = self.device.compare_config()
