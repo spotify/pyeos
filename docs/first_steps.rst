@@ -125,7 +125,7 @@ Something happened here. That command has not been converted to JSON yet so the 
 
      C      10.48.68.0/22 is directly connected, Management1
 
-Or you can also explictly ask for text output::
+Or you can also explicitly ask for text output::
 
     >>> lldp = device.show_lldp_neighbors(format='text')
     >>> print lldp['output']
@@ -137,6 +137,49 @@ Or you can also explictly ask for text output::
 
     Port       Neighbor Device ID             Neighbor Port ID           TTL
     Ma1        lom-bjg61-r1-1                 6                          120
+
+You can also send 'pipe' filters, for example::
+
+    >>> print device.show_ip_bgp_summary(format='text', pipe='include 10.0.0.12')['output']
+    10.0.0.12        4  65002            214       213    0    0 03:28:21 Estab  2      2
+
+Or::
+
+    >>> print device.show_ip_bgp_neighbors(format='text', pipe='section 10.0.0.12')['output']
+    BGP neighbor is 10.0.0.12, remote AS 65002, external link
+      BGP version 4, remote router ID 10.0.0.12, VRF default
+      Negotiated BGP version 4
+      Last read 00:00:07, last write 00:00:15
+      Hold time is 180, keepalive interval is 60 seconds
+      Configured hold time is 180, keepalive interval is 60 seconds
+      Connect timer is inactive
+      Restart timer is inactive
+      End of rib timer is inactive
+      BGP state is Established, up for 03:30:15
+      Number of transitions to established: 1
+      Last state was OpenConfirm
+      Last event was RecvKeepAlive
+      Neighbor Capabilities:
+        Multiprotocol IPv4 Unicast: advertised and received and negotiated
+        Four Octet ASN: advertised and received
+        Route Refresh: advertised and received and negotiated
+        Send End-of-RIB messages: advertised
+      Message statistics:
+        InQ depth is 0
+        OutQ depth is 0
+                             Sent      Rcvd
+        Opens:                  1         1
+        Notifications:          0         0
+        Updates:                2         3
+        Keepalives:           212       212
+        Route-Refresh:          0         0
+        Total messages:       215       216
+      Prefix statistics:
+                             Sent      Rcvd
+        IPv4 Unicast:           3         2
+        IPv6 Unicast:           0         0
+    Remote TCP address is 10.0.0.12, remote port is 179
+
 
 Running arbitrary commands
 --------------------------

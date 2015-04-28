@@ -45,7 +45,12 @@ class EOS:
 
     def __getattr__(self, item):
         def wrapper(*args, **kwargs):
-            cmd = [item.replace('_', ' ')]
+            pipe = kwargs.pop('pipe', None)
+
+            if pipe is None:
+                cmd = [item.replace('_', ' ')]
+            else:
+                cmd = ['{} | {}'.format(item.replace('_', ' '), pipe)]
             return self.run_commands(cmd, **kwargs)[1]
 
         if item.startswith('show'):
