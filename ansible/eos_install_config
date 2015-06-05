@@ -89,6 +89,7 @@ EXAMPLES = '''
         config_file=~/spotify/network-ansible/compiled/{{ inventory_hostname }}/running.conf
         commit_changes={{commit_changes}}
         diff_file=logs/{{ inventory_hostname }}.log
+        syslog_address={{ syslog_address }}
 
     From the CLI we would trigger the playbook like:
 
