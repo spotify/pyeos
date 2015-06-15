@@ -22,6 +22,7 @@
 from pyEOS import EOS
 import ast
 import logging
+import logging.handlers
 
 logger = logging.getLogger('eos_install_config')
 
@@ -63,6 +64,13 @@ options:
         description: A file where to store the "diff" between the running configuration and the new configuration. If
                      it's not set the diff between configurations is not saved.
         required: False
+    syslog_address:
+        description: A syslog server the "diff" between the running configuration and the new configuration is sent
+        to. If it's not set, data are not sent.
+        required: False
+    syslog_port:
+        description: The port used to query the rsyslog server. If it's not set, use the default port (UDP/514).
+        required: False
 '''
 
 EXAMPLES = '''
@@ -81,6 +89,7 @@ EXAMPLES = '''
         config_file=~/spotify/network-ansible/compiled/{{ inventory_hostname }}/running.conf
         commit_changes={{commit_changes}}
         diff_file=logs/{{ inventory_hostname }}.log
+        syslog_address={{ syslog_address }}
 
     From the CLI we would trigger the playbook like:
 
@@ -98,6 +107,10 @@ def save_to_file(content, filename):
     with open(filename, 'w') as f:
         f.write(content)
 
+def send_to_syslogd(content, port, address):
+    handler = logging.handlers.SysLogHandler((address,port))
+    logger.addHandler(handler)
+    logger.error(content)
 
 def main():
     module = AnsibleModule(
@@ -109,6 +122,8 @@ def main():
             config_file=dict(required=True),
             commit_changes=dict(required=True),
             diff_file=dict(required=False, default=None),
+            syslog_address=dict(required=False, default=None),
+            syslog_port=dict(required=False, default=514),
         ),
         supports_check_mode=True
     )
@@ -121,6 +136,9 @@ def main():
     config_file = module.params['config_file']
     commit_changes = module.params['commit_changes']
     diff_file = module.params['diff_file']
+
+    syslog_address = module.params['syslog_address']
+    syslog_port = module.params['syslog_port']
 
     if commit_changes.__class__ is str:
         commit_changes = ast.literal_eval(commit_changes)
@@ -137,6 +155,9 @@ def main():
 
     if diff_file is not None:
         save_to_file(diff, diff_file)
+
+    if syslog_address is not None:
+        send_to_syslogd(diff, int(syslog_port), syslog_address)
 
     if module.check_mode or not commit_changes:
         module.exit_json(changed=False, msg=diff)
